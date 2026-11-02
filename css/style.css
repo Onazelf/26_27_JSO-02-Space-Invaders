@@ -1,3 +1,26 @@
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/* End Reset CSS */
+
+/* Variables */
+:root {
+    --color-bg: #050505;
+    --color-text: #cfe8ff;
+    --color-accent: #00ccff;
+    --font-mono: "Courier New", monospace;
+}
+
+/* End Variables */
+
 body {
-    background-color: aquamarine;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-mono);
 }
