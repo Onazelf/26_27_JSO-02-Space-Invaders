@@ -8,6 +8,7 @@
 
 // --- Imports ---
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./core/constants.js";
+import { buildImagePath } from "./data/assets.js";
 
 // On récupère l'élément HTML du canvas
 const canvas = document.getElementById("game");
@@ -20,6 +21,7 @@ canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 
 async function main() {
+    console.log(buildImagePath());
     console.log("App Démarrée");   
 }
 
