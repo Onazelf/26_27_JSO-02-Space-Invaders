@@ -1,0 +1,10 @@
+{
+    "name": "space-invaders-diy",
+    "version": "1.0.0",
+    "description": "SPace Invaders en Javascript Objet - Prépa Dev",
+    "private": "true",
+    "type": "module",
+    "scripts": {
+        "start": "python3 -m http.server 8080"
+    }
+}

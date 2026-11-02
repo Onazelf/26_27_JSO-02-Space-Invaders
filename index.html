@@ -9,7 +9,20 @@
     <title>Space Invaders DIY</title>
 </head>
 <body>
-    
+    <main>
+        <h1 class="visually-hidden">Space Invaders</h1>
+
+        <canvas id="game" role="img" aria-label="Zone de jeu Space Invaders"></canvas>
+
+        <p id="status" role="status" aria-live="polite"></p>
+
+        <p class="controls">
+            <kbd>←</kbd> <kbd>→</kbd> déplacer ∙ <kbd>Espace</kbd> tirer ∙
+            <kbd>P</kbd> pause ∙ <kbd>R</kbd> rejouer ∙ <kbd>M</kbd> son
+        </p>
+
+        <noscript>Javascript est nécessaire pour jouer.</noscript>
+    </main>
     <!-- type = "module" permet de faire des import/export. Le projet doit être servi par un serveur local -->
     <script src="./js/script.js"></script>
 </body>
