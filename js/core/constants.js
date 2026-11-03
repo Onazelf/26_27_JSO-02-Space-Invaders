@@ -25,3 +25,11 @@ export const PLAYER_BULLET_SPEED = 520; // (px/s) : plus rapide que les tirs enn
 export const ENEMY_BULLET_WIDTH = 14;
 export const ENEMY_BULLET_HEIGHT = 42;
 export const ENEMY_BULLET_SPEED = 300;
+
+// --- Joueur ---
+export const PLAYER_SIZE = 64;
+export const PLAYER_BOTTOM_MARGIN = 24;
+// Une constante peut être calculé à partir d'autres constantes : ici le haut du vaisseau
+export const PLAYER_Y = CANVAS_HEIGHT - PLAYER_SIZE - PLAYER_BOTTOM_MARGIN;
+// Durée d'invincibilité (s) après avoir été touché
+export const INVINCIBILITY_DURATION = 1.5;
