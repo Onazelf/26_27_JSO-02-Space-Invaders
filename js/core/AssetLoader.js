@@ -1,5 +1,6 @@
 /**
  * Chargement des images
+ * 
  * POURQUOI charger AVANT de jouer ? Une image met un petit moment à se charger du disque ou du réseau
  * Si on essaye de dessiner trop tôt, rien qui s'affiche.
  * Et on ne crée JAMAIS new Image() dans la boucle de rendu (60 fois par seconde !)

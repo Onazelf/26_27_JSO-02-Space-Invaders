@@ -7,7 +7,7 @@
 */
 import { Entity } from "./Entity.js";
 
-class Bullet extends Entity {
+export class Bullet extends Entity {
     /**
      * Le troisième paramètre est un OBJET dont on extrait les propriétés ("destructuring" dans la signature)
      * `{ width, height, ... }` équivaut à écrire option.width, option.height, ...

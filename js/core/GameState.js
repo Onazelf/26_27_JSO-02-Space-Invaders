@@ -1,5 +1,6 @@
 /**
  * Les états du jeu possible
+ * 
  * A tout moment, le jeu est dans un SEUL de ces états. Game regarde l'état courant pour savoir quoi faire
  * PLAYING : tout bouge et le joueur peut tirer
  * PAUSED : rien ne bouge et on affiche pause
