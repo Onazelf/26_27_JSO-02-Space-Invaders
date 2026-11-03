@@ -33,3 +33,9 @@ export const PLAYER_BOTTOM_MARGIN = 24;
 export const PLAYER_Y = CANVAS_HEIGHT - PLAYER_SIZE - PLAYER_BOTTOM_MARGIN;
 // Durée d'invincibilité (s) après avoir été touché
 export const INVINCIBILITY_DURATION = 1.5;
+
+// --- Ennemis ---
+export const ENEMY_SIZE = 48;
+export const ENEMY_GAP_X = 72; // Distance entre 2 colonnes (de coin à coin)
+export const ENEMY_GAP_Y = 58; // Distance entre 2 rangées
+export const ENEMY_START_Y = 80; // Position verticale de la première rangée
