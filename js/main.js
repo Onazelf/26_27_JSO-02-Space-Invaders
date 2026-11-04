@@ -11,6 +11,8 @@ import { AssetLoader } from "./core/AssetLoader.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./core/constants.js";
 import { Game } from "./core/Game.js";
 import { buildImagePath, SOUND_PATHS } from "./data/assets.js";
+import { LEVELS } from "./data/levels.js";
+import { DEFAULT_SHIP } from "./data/ships.js";
 import { SoundManager } from "./managers/SoundManager.js";
 
 // On récupère l'élément HTML du canvas
@@ -36,9 +38,10 @@ async function main() {
         const game = new Game(canvas, assetLoader, soundManager);
 
         // TODO: chargement du level
+        game.startLevel(LEVELS[0], DEFAULT_SHIP);
         // Démarrage de la boucle de jeu
         game.start();
-        
+
         status.textContent = "";
 
     } catch (e) {

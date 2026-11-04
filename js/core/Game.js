@@ -1,12 +1,14 @@
 /**
  * Chef d'orchestre du jeu
 */
+import { computeShipAttributes } from "../data/ships.js";
+import { Player } from "../entities/Player.js";
 import { CollisionManager } from "../managers/CollisionManager.js";
 import { EnemyManager } from "../managers/EnemyManager.js";
 import { ExplosionManager } from "../managers/ExplosionManager.js";
 import { ProjectileManager } from "../managers/ProjectileManager.js";
 import { HUD } from "../ui/HUD.js";
-import { CANVAS_WIDTH } from "./constants.js";
+import { CANVAS_WIDTH, PLAYER_SIZE, PLAYER_Y } from "./constants.js";
 import { GameState } from "./GameState.js";
 import { InputManager } from "./InputManager.js";
 
@@ -48,6 +50,37 @@ export class Game {
         this.#projectiles = new ProjectileManager(assetLoader, CANVAS_WIDTH);
         this.#enemies = new EnemyManager(assetLoader);
         this.#explosions = new ExplosionManager(assetLoader.get("explosion"))
+    }
+
+    // ----------------------------------------------------------------
+    // CYCLE DE VIE D'UNE PARTIE
+    // ----------------------------------------------------------------
+    /**
+     * Initialiser une partie sur un niveau, avec un vaisseau donné
+     * On l'appelle au démarrage ET à chaque "Rejouer" : tout est remis à zéro
+     * @param {object} level voir data/levels.js
+     * @@param {object} ship voir data/ships.js
+     */
+    startLevel(level, ship) {
+        this.#level = level;
+        this.#ship = ship;
+        this.#score = 0;
+        this.#enemyShootTimer = level.shootInterval;
+
+        // On réinitialise avant d'instancier
+        this.#projectiles.clear();
+        this.#explosions.clear();
+        this.#enemies.spawn(level);
+
+        // Le joueur est créé centré en bas de l'écran, avec les attributs du vaisseau
+        this.#player = new Player(
+            CANVAS_WIDTH / 2 - PLAYER_SIZE / 2,
+            PLAYER_Y,
+            this.#assetLoader.get(ship.id),
+            computeShipAttributes(ship.stats)
+        );
+
+        this.#state = GameState.PLAYING;
     }
 
     /**
