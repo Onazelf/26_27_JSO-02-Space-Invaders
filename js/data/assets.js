@@ -29,3 +29,19 @@ export function buildImagePath() {
 
     return paths;
 }
+
+export const SOUND_PATHS = {
+    playerShot: './assets/sounds/player-shot.wav',
+    enemyShot: './assets/sounds/enemy-shot.wav',
+    explosionSmall: './assets/sounds/explosion-small.wav',
+    explosionBig: './assets/sounds/explosion-big.wav',
+    hit: './assets/sounds/hit.wav',
+    gameOver: './assets/sounds/game-over.wav',
+    victory: './assets/sounds/victory.wav',
+    // Pour les exercices :
+    menuSelect: './assets/sounds/menu-select.wav',
+    bossArrive: './assets/sounds/boss-arrive.wav',
+    bossDeath: './assets/sounds/boss-death.wav',
+    powerup: './assets/sounds/powerup.wav',
+    shield: './assets/sounds/shield.wav',
+};
