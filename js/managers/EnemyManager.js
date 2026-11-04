@@ -1,4 +1,3 @@
-
 /**
  * Gère la grille d'ennemis : création à partir d'un niveau, déplacement collectif, choix des ennemis qui peuvent tirer, dessiner le tout
  * 
@@ -99,8 +98,84 @@ export class EnemyManager {
 
     /**
      * Méthode pour supprimer un ennemi
+     * @param {Enemy}
+     * @returns {void}
      */
     removeEnemy(enemyToRemove) {
         this.#enemies = this.#enemies.filter( (enemy) => enemy !== enemyToRemove )
+    }
+
+    /**
+     * Méthode qui déplace la grille d'ennemis en gérant la collision des bords et fait descendre la grille à chaque aller/retour
+     * @param {number} dt 
+     * @param {number} canvasWidth
+     * 
+     * @returns
+     */
+    update(dt, canvasWidth) {
+        if(this.isCleared) {
+            return;
+        }
+
+        // Déplacement horizontal prévu pour cette image (px/s * s * direction)
+        const dx = this.currentSpeed * dt * this.#direction;
+
+        // On calcule les bords du BLOC entier
+        const leftMost = Math.min(...this.#enemies.map( (enemy) => enemy.x ));
+        const rightMost = Math.max(...this.#enemies.map( (enemy) => enemy.x + enemy.width ));
+
+        // On regarde où le bloc serait après le déplacement
+        const willHitEdge = leftMost + dx <= 0 || rightMost + dx >= canvasWidth;
+
+        if(willHitEdge) {
+            // On fait un demi-tour : on inverse le sens de direction
+            this.#direction *= -1;
+
+            for(const enemy of this.#enemies) {
+                enemy.moveBy(0, this.#stepDown);
+            }
+
+            return;
+        }
+
+        for(const enemy of this.#enemies) {
+            enemy.moveBy(dx, 0);
+        }
+    }
+
+    /**
+     * Seuls les ennemis les plus en bas pourront tirer, pour éviter que les projectiles traversent les autres ennemis
+     * Une Map associe une clé (ici le numéro de colonne) à une valeur (l'ennemi le plus bas trouvé jusque là pour cette colonne)
+     * @returns {Array}
+     */
+    getShooters() {
+        const lowestByColumn = new Map();
+
+        for(const enemy of this.#enemies) {
+            const current = lowestByColumn.get(enemy.column);
+            // Si il n'y a plus d'ennemis sur une colonne
+            if(!current || enemy.y > current.y) {
+                lowestByColumn.set(enemy.column, enemy)
+            }
+        }
+
+        return [...lowestByColumn.values()];
+    }
+
+    /**
+     * Vide la grille (utilisé lorsqu'on relance une partie)
+     */
+    clear() {
+        this.#enemies = [];
+    }
+
+    /**
+     * On dessine la grille
+     * @param {CanvasRenderingContext2D} ctx
+     */
+    draw(ctx) {
+        for(const enemy of this.#enemies) {
+            enemy.draw(ctx);
+        }
     }
 }
