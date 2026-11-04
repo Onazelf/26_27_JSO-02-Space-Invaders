@@ -39,3 +39,7 @@ export const ENEMY_SIZE = 48;
 export const ENEMY_GAP_X = 72; // Distance entre 2 colonnes (de coin à coin)
 export const ENEMY_GAP_Y = 58; // Distance entre 2 rangées
 export const ENEMY_START_Y = 80; // Position verticale de la première rangée
+
+// --- Explosions ---
+export const EXPLOSION_DURATION = 0.45;
+export const EXPLOSION_SIZE = 72;
