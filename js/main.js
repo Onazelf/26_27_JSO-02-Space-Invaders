@@ -7,8 +7,11 @@
 
 
 // --- Imports ---
+import { AssetLoader } from "./core/AssetLoader.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./core/constants.js";
-import { buildImagePath } from "./data/assets.js";
+import { Game } from "./core/Game.js";
+import { buildImagePath, SOUND_PATHS } from "./data/assets.js";
+import { SoundManager } from "./managers/SoundManager.js";
 
 // On récupère l'élément HTML du canvas
 const canvas = document.getElementById("game");
@@ -21,8 +24,27 @@ canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 
 async function main() {
-    console.log(buildImagePath());
-    console.log("App Démarrée");   
+    // try / catch: si une étape échoue (image introuvable) on tombe dans le catch au lieu de laisser le jeu planter brutalement
+    try {
+        const assetLoader = new AssetLoader();
+        const soundManager = new SoundManager();
+
+        status.textContent = "Chargement des ressources.."
+        soundManager.load(SOUND_PATHS); // Les sont chargés en arrière-plan
+        await assetLoader.loadAll(buildImagePath()); // On ATTEND les images: indispensable pour jouer
+
+        const game = new Game(canvas, assetLoader, soundManager);
+
+        // TODO: chargement du level
+        // Démarrage de la boucle de jeu
+        game.start();
+        
+        status.textContent = "";
+
+    } catch (e) {
+        status.textContent = `Erreur au chargement du jeu : ${e.message}`;
+        console.log(e);
+    }
 }
 
 main();
