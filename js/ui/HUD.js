@@ -56,7 +56,7 @@ export class HUD {
 
     #drawText(ctx, text, x, y, { size = 16, color = "#ffffff", align = "left", bold = false } = {} ) {
         ctx.fillStyle = color;
-        ctx.font = `${bold ? "bold" : ""}${size}px monospace`;
+        ctx.font = `${bold ? "bold" : ""} ${size}px monospace`;
         ctx.textAlign = align; // left | center | right : x et y le point d'ancrage
         ctx.fillText(text, x, y);
         ctx.textAlign = "left"; // On remet la valeur par défaut pour ne pas perturber les autres dessins

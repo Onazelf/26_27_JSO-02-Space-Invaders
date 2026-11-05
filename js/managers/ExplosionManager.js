@@ -73,7 +73,7 @@ export class ExplosionManager {
         const frame = Math.min(USED_FRAMES - 1, Math.floor(progress * USED_FRAMES) );
 
         const sourceX = (frame % COLUMNS) * frameSize;
-        const sourceY = Math.floor((frame / COLUMNS) * frameSize);
+        const sourceY = Math.floor(frame / COLUMNS) * frameSize;
 
         ctx.drawImage(
             this.#sheet, // source

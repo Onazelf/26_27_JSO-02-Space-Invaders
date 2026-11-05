@@ -156,6 +156,7 @@ export class Game {
         this.updateEnemyShooting(dt);
 
         this.#handleCollisions();
+        this.#checkEndOfGame();
     }
 
     /**
@@ -288,7 +289,22 @@ export class Game {
     // ----------------------------------------------------------------
     // FIN DE PARTIE
     // ----------------------------------------------------------------
+    #checkEndOfGame() {
+        // Invasion : Le bas des aliens est arrivé à la hauteur du vaisseau
+        const hasBeenInvaded = this.#enemies.lowestBottom >= this.#player.y;
 
+        // On teste la défaite avant la victoire
+        if(!this.#player.isAlive || hasBeenInvaded) {
+            this.#state = GameState.GAME_OVER;
+            this.#sound.play("gameOver");
+            return;
+        }
+
+        if(this.#enemies.isCleared) {
+            this.#state = GameState.VICTORY;
+            this.#sound.play("victory");
+        }
+    }
 
     /**
      * Construction du background du canvas (soit l'image, soit un background de secours)
@@ -319,5 +335,13 @@ export class Game {
         this.#enemies.draw(ctx);
         this.#projectiles.draw(ctx);
         this.#explosions.draw(ctx);
+
+        this.#hud.drawStats(ctx, {
+            score: this.#score,
+            lives: this.#player.lives,
+            levelName: this.#level.name,
+            shipSprite: this.#assetLoader.get(this.#ship.id)
+        });
+        this.#hud.drawOverlay(ctx, this.#state, this.#score);
     }
 }
