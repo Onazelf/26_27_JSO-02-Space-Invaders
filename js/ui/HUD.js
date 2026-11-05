@@ -61,4 +61,47 @@ export class HUD {
         ctx.fillText(text, x, y);
         ctx.textAlign = "left"; // On remet la valeur par défaut pour ne pas perturber les autres dessins
     }
+
+    /**
+     * Ecrans superposés pour les états pause, game over et victory
+     * Ne dessine rien pour les autres états
+     */
+    drawOverlay(ctx, state, score) {
+        const overlay = OVERLAYS[state]; // On va chercher les textes de l'état courant
+
+        if(!overlay) {
+            return; // On est dans l'état PLAYING, donc pas d'écran superposé
+        }
+
+        const { width, height } = ctx.canvas; // Destructuration
+
+        // Voile sombre sur toute la scène (qui reste visible en dessous)
+        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+        ctx.fillRect(0, 0, width, height);
+
+        this.#drawText(ctx, overlay.title, width / 2, height / 2 - 40, {
+            size: 56,
+            color: overlay.color,
+            align: "center",
+            bold: true
+        });
+
+        if(state !== GameState.PAUSED) {
+            // Si on est dans GAME OVER ou VICTORY
+            // On affiche le score
+            this.#drawText(ctx, `Score final : ${score}`, width / 2, height / 2 + 10, {
+                    size: 24,
+                    align: "center"
+            });
+        }
+
+        // Chaque ligne est décalée de 30px vers le bas grâce à son numéro (index)
+        overlay.lines.forEach( (line, index) => {
+            this.#drawText(ctx, line, width / 2, height / 2 + 56 + index * 30, {
+                size: 18,
+                color: #cccccc,
+                align: "center"
+            })
+        })
+    }
 }

@@ -105,6 +105,10 @@ export class Game {
         // On efface tout pour reconstruire
         ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
         this.#drawBackground();
+
+        // L'ORDRE DES DESSINS compte : ce qui est dessiné en dernier apparaît par dessus (calques)
+        // Fond => Joueur => Ennemis => Tirs => Explosions => Interface => Overlays
+        this.#player.draw(ctx);
     }
 
     /**
@@ -174,6 +178,10 @@ export class Game {
      */
     #updatePlaying(dt) {
         this.#updatePlayer(dt);
+        this.#projectiles.update(dt);
+        this.#enemies.update(dt, CANVAS_WIDTH);
+        this.#explosions.update(dt);
+        this.updateEnemyShooting(dt);
     }
 
     /**
@@ -201,5 +209,30 @@ export class Game {
             player.registerShot(); // Relance le délai
             this.#sound.play("playerShot", 0.7);
         }
+    }
+
+    /**
+     * Les ennemis tirent à intervalles réguliers
+     * Un compte à rebours diminue avec dt, ça doit respecter l'écran de pause : quand le jeu est en pause, update n'est pas appelé, le compteur est donc gelé
+     */
+    updateEnemyShooting(dt) {
+        this.#enemyShootTimer -= dt;
+
+        if(this.#enemyShootTimer > 0) {
+            return; // Pas encore le moment de tirer
+        }
+
+        const shooters = this.#enemies.getShooters();
+
+        if(shooters.length > 0) {
+            // Nombre entier aléatoire entre 0 et (shooters.length - 1)
+            // Math.random() donne un décimal dans [0, 1], on le multiplie puis on arrondit vers le bas
+            const shooter = shooters[Math.floor(Math.random() * shooters.length)];
+
+            this.#projectiles.createEnemyBullet(shooter);
+            this.#sound.play("enemyShot", 0.5);
+        }
+
+        this.#enemyShootTimer = this.#level.shootInterval; // On relance le compte à rebours
     }
 }
