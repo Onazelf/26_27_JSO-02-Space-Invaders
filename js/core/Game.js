@@ -84,34 +84,6 @@ export class Game {
     }
 
     /**
-     * Construction du background du canvas (soit l'image, soit un background de secours)
-     */
-    #drawBackground() {
-        const background = this.#assetLoader.get("background");
-
-        if (background) {
-            this.#ctx.drawImage(background, 0, 0, this.#canvas.width, this.#canvas.height);
-        } else {
-            this.#ctx.fillStyle = "#050510";
-            this.#ctx.fillRect(0, 0, this.#canvas.width, this.#canvas.height);
-        }
-    }
-
-    /**
-     * RENDER: dessine tous les éléments de la scène et l'interface
-     */
-    render() {
-        const ctx = this.#ctx;
-        // On efface tout pour reconstruire
-        ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
-        this.#drawBackground();
-
-        // L'ORDRE DES DESSINS compte : ce qui est dessiné en dernier apparaît par dessus (calques)
-        // Fond => Joueur => Ennemis => Tirs => Explosions => Interface => Overlays
-        this.#player.draw(ctx);
-    }
-
-    /**
      * Permet de démarrer la boucle de jeu
      */
     start() {
@@ -182,6 +154,8 @@ export class Game {
         this.#enemies.update(dt, CANVAS_WIDTH);
         this.#explosions.update(dt);
         this.updateEnemyShooting(dt);
+
+        this.#handleCollisions();
     }
 
     /**
@@ -234,5 +208,116 @@ export class Game {
         }
 
         this.#enemyShootTimer = this.#level.shootInterval; // On relance le compte à rebours
+    }
+
+    // ----------------------------------------------------------------
+    // COLLISIONS: CollisionManager DETECTE et Game DECIDE
+    // ----------------------------------------------------------------
+    /**
+     * Détecte les collisions et applique leur conséquences dans l'ordre prévu
+     */
+    #handleCollisions() {
+        this.#handlePlayerBulletHitEnemies();
+        this.#handleEnemyBulletHitPlayer();
+        this.#handleEnemiesTouchPlayer();
+    }
+
+    /**
+     * Gère les tirs du joueur qui touchent les ennemis et leur attribue les DGT
+     */
+    #handlePlayerBulletHitEnemies() {
+        // playerBullets et enemies renvoient des copies : on peut donc supprimer dans les vrais tableaux pendant qu'on parcourt les copies sans rien casser
+        for(const bullet of this.#projectiles.playerBullets) {
+            const enemy = this.#collisions.findFirstCollision(bullet, this.#enemies.enemies);
+
+            if(!enemy) {
+                continue; // Ce tir ne touche rien : on passe au suivant
+            }
+
+            this.#projectiles.removePlayerBullet(bullet); // Ce tir est consommé, on l'efface
+            // takeHit renvoie true si l'ennemi est détruit (un boss, lui, peut survivre)
+            if(enemy.takeHit(bullet.damage)) {
+                this.#score += enemy.points;
+                this.#explosions.spawn(enemy.centerX, enemy.centerY);
+                this.#sound.play("explosionSmall", 0.75);
+                this.#enemies.removeEnemy(enemy);
+            }
+        }
+    }
+
+    /**
+     * Gère les tirs des ennemis qui touchent le joueur et lui retire une vie
+     */
+    #handleEnemyBulletHitPlayer() {
+        const bullet = this.#collisions.findFirstCollision(this.#player, this.#projectiles.enemyBullets);
+
+        if(!bullet) {
+            return; // Aucun missile ennemi n'a touché le joueur
+        }
+
+        // Le tir est consommé dans tout les cas ; même si le joueur est invincible
+        this.#projectiles.removeEnemyBullet(bullet);
+        this.#damagePlayer();
+
+    }
+
+    /**
+     * Un alien touche le joueur
+     */
+    #handleEnemiesTouchPlayer() {
+        const enemy = this.#collisions.findFirstCollision(this.#player, this.#enemies.enemies);
+
+        if(enemy) {
+            this.#damagePlayer();
+        }
+    }
+
+    /**
+     * Point unique pour blesser le joueur
+     */
+    #damagePlayer() {
+        // takeDamage répond false pendant l'invincibilité : alors on ne fait rien
+        if(!this.#player.takeDamage()) {
+            return;
+        }
+
+        this.#explosions.spawn(this.#player.centerX, this.#player.centerY);
+        this.#sound.play("hit", 0.9);
+    }
+
+    // ----------------------------------------------------------------
+    // FIN DE PARTIE
+    // ----------------------------------------------------------------
+
+
+    /**
+     * Construction du background du canvas (soit l'image, soit un background de secours)
+     */
+    #drawBackground() {
+        const background = this.#assetLoader.get("background");
+
+        if(background) {
+            this.#ctx.drawImage(background, 0, 0, this.#canvas.width, this.#canvas.height);
+        } else {
+            this.#ctx.fillStyle = "#050510";
+            this.#ctx.fillRect(0, 0, this.#canvas.width, this.#canvas.height);
+        }
+    }
+
+    /**
+     * RENDER: dessine tous les éléments de la scène et l'interface
+     */
+    render() {
+        const ctx = this.#ctx;
+        // On efface tout pour reconstruire
+        ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+        this.#drawBackground();
+
+        // L'ORDRE DES DESSINS compte : ce qui est dessiné en dernier apparaît par dessus (calques)
+        // Fond => Joueur => Ennemis => Tirs => Explosions => Interface => Overlays
+        this.#player.draw(ctx);
+        this.#enemies.draw(ctx);
+        this.#projectiles.draw(ctx);
+        this.#explosions.draw(ctx);
     }
 }

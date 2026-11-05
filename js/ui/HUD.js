@@ -99,9 +99,9 @@ export class HUD {
         overlay.lines.forEach( (line, index) => {
             this.#drawText(ctx, line, width / 2, height / 2 + 56 + index * 30, {
                 size: 18,
-                color: #cccccc,
+                color: "#cccccc",
                 align: "center"
             })
-        })
+        });
     }
 }

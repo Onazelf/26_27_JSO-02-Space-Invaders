@@ -19,7 +19,7 @@ export const LEVELS = [
         rows: ["alien1", "alien2", "alien3"],
         points: [30, 20, 10],
         columns: 9,
-        ennemySpeed: 70,
+        enemySpeed: 70,
         stepDown: 20,
         shootInterval: 1.1
     }
