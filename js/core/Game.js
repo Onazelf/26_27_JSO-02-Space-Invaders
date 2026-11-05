@@ -129,7 +129,77 @@ export class Game {
         requestAnimationFrame(loop);
     }
 
+    // ----------------------------------------------------------------
+    // UPDATE : La logique du jeu (aucun dessin ici)
+    // ----------------------------------------------------------------
     update(dt) {
-        
+        this.#handleGlobalInput();
+
+        // Quand le jeu n'est pas en cours (pause, fin de partie), plus rien ne bouge : c'est ce simple if qui réalise la pause
+        if(this.#state === GameState.PLAYING) {
+            this.#updatePlaying(dt);
+        }
+
+        // LAST TODO: ce qui vient d'être pressé ne vaut que pour cette image
+        this.#input.endFrame();
+    }
+
+    /**
+     * Touches qui marchent quel que soit l'état: son, pause, rejouer...
+     */
+    #handleGlobalInput() {
+        if(this.#input.wasPressed("KeyM")) {
+            this.#sound.toggleMute();
+        }
+
+        const wantsPause = this.#input.wasPressed("KeyP") || this.#input.wasPressed("Escape");
+
+        // Une même touche fait 2 choses selon l'état: c'est une TRANSITION d'état
+        if(wantsPause && this.#state === GameState.PLAYING) {
+            this.#state = GameState.PAUSED;
+        } else if (wantsPause && this.#state === GameState.PAUSED) {
+            this.#state = GameState.PLAYING;
+        }
+
+        const isFinished = this.#state === GameState.VICTORY || GameState.GAME_OVER;
+
+        if(this.#input.wasPressed("KeyR") && isFinished) {
+            this.startLevel(this.#level, this.#ship);
+        }
+    }
+
+    /**
+     * Tout ce qui se passe pendant qu'on joue. L'ORDRE compte :
+     * On déplace tout, puis on teste
+     */
+    #updatePlaying(dt) {
+        this.#updatePlayer(dt);
+    }
+
+    /**
+     * Déplace le joueur et gère ses tirs selon les commandes reçues
+     */
+    #updatePlayer(dt) {
+        const player = this.#player;
+
+        player.update(dt); // Ecoule le délai de tir et d'invincibilité
+
+        // isPressed : tant que la touche est maintenue, on bouge a chaque image
+        if(this.#input.isPressed("ArrowLeft")) {
+            player.moveLeft(dt);
+        }
+
+        if(this.#input.isPressed("ArrowRight")) {
+            player.moveRight(dt, CANVAS_WIDTH);
+        }
+
+        const wantsToShot = this.#input.isPressed("Space") || this.#input.isPressed("ArrowUp");
+
+        // Le joueur n'a pas le droit de tirer à chaque image: canShoot() impose le délai
+        if(wantsToShot && player.canShoot()) {
+            this.#projectiles.createPlayerBullet(player);
+            player.registerShot(); // Relance le délai
+            this.#sound.play("playerShot", 0.7);
+        }
     }
 }
