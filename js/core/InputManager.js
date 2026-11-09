@@ -7,7 +7,7 @@ const GAME_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "S
 /**
  * Mémorise l'état du clavier
  * 
- * Pourquoi une classe dédiée ? Le joueur ne doit jamais lirele clavier lui-même
+ * Pourquoi une classe dédiée ? Le joueur ne doit jamais lire le clavier lui-même
  * Game interroge ce manager puis commande le joueur. Chaque classe garde ainsi UNE responsabilité
  * 
  * Pourquoi mémoriser l'état ? Le navigateur n'envoie un événement par exemple "keydown" qu'au moment de l'appui. OR on veut savoir, a CHAQUE IMAGE, si la flèche est toujours enfoncée. On retient donc l'état dans un Set

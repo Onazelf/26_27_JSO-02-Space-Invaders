@@ -19,5 +19,6 @@ export const GameState = Object.freeze({
     PLAYING: "playing",
     PAUSED: "paused",
     GAME_OVER: "gameover",
-    VICTORY: "victory"
+    VICTORY: "victory",
+    MAIN_MENU: "main-menu"
 })

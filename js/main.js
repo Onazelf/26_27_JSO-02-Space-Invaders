@@ -5,7 +5,6 @@
  * Son rôle : préparer les ressouces, créer le jeu, le lancer. Il n'y aura aucune logique de jeu ici
  */
 
-
 // --- Imports ---
 import { AssetLoader } from "./core/AssetLoader.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./core/constants.js";
@@ -37,7 +36,7 @@ async function main() {
 
         const game = new Game(canvas, assetLoader, soundManager);
 
-        // TODO: chargement du level
+        // Chargement du level
         game.startLevel(LEVELS[0], DEFAULT_SHIP);
         // Démarrage de la boucle de jeu
         game.start();

@@ -1,4 +1,3 @@
-
 /**
  * Affichage de l'interface : score, les vies, le nom du vaisseau, les écrans superposés (game over, écran de pause)
  * 
@@ -14,7 +13,7 @@ const OVERLAYS = {
     },
 
     [GameState.GAME_OVER] : {
-        title: "GAME OVER",
+        title: "GAME OVER...",
         color: "#ff6677",
         lines: ["R pour Rejouer"]
     },
@@ -23,6 +22,12 @@ const OVERLAYS = {
         title: "VICTOIRE !",
         color: "#4beb6e",
         lines: ["R pour Rejouer"]
+    },
+
+    [GameState.MAIN_MENU] : {
+        title: "MENU PRINCIPAL",
+        color: "#ffffff",
+        lines: ["Entrée pour lancer une partie"]
     }
 }
 
@@ -76,7 +81,8 @@ export class HUD {
         const { width, height } = ctx.canvas; // Destructuration
 
         // Voile sombre sur toute la scène (qui reste visible en dessous)
-        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+        // Si l'overlay affiché est le menu principal, rend le fond complètement opaque
+        overlay.MAIN_MENU ? ctx.fillStyle = "rgb(15, 15, 15)" : ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
         ctx.fillRect(0, 0, width, height);
 
         this.#drawText(ctx, overlay.title, width / 2, height / 2 - 40, {
@@ -86,7 +92,7 @@ export class HUD {
             bold: true
         });
 
-        if(state !== GameState.PAUSED) {
+        if(state === GameState.GAME_OVER || state === GameState.VICTORY) {
             // Si on est dans GAME OVER ou VICTORY
             // On affiche le score
             this.#drawText(ctx, `Score final : ${score}`, width / 2, height / 2 + 10, {

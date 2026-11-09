@@ -28,7 +28,7 @@ export class Game {
     #explosions;
 
     // --- Etats de la partie ---
-    #state = GameState.PLAYING;
+    #state = GameState.MAIN_MENU;
     #player = null;
     #level = null; // Le niveau en cours (objet de data/levels.js)
     #ship = null; // Le vaisseau choisi (objet de data/ships.js)
@@ -105,31 +105,16 @@ export class Game {
         requestAnimationFrame(loop);
     }
 
-    // ----------------------------------------------------------------
-    // UPDATE : La logique du jeu (aucun dessin ici)
-    // ----------------------------------------------------------------
-    update(dt) {
-        this.#handleGlobalInput();
-
-        // Quand le jeu n'est pas en cours (pause, fin de partie), plus rien ne bouge : c'est ce simple if qui réalise la pause
-        if(this.#state === GameState.PLAYING) {
-            this.#updatePlaying(dt);
-        }
-
-        // LAST TODO: ce qui vient d'être pressé ne vaut que pour cette image
-        this.#input.endFrame();
-    }
-
     /**
      * Touches qui marchent quel que soit l'état: son, pause, rejouer...
-     */
-    #handleGlobalInput() {
-        if(this.#input.wasPressed("KeyM")) {
+    */
+   #handleGlobalInput() {
+       if(this.#input.wasPressed("KeyM")) {
             this.#sound.toggleMute();
         }
-
+        
         const wantsPause = this.#input.wasPressed("KeyP") || this.#input.wasPressed("Escape");
-
+        
         // Une même touche fait 2 choses selon l'état: c'est une TRANSITION d'état
         if(wantsPause && this.#state === GameState.PLAYING) {
             this.#state = GameState.PAUSED;
@@ -138,27 +123,42 @@ export class Game {
         }
 
         const isFinished = this.#state === GameState.VICTORY || GameState.GAME_OVER;
-
+        
         if(this.#input.wasPressed("KeyR") && isFinished) {
             this.startLevel(this.#level, this.#ship);
         }
+    }
+    
+    // ----------------------------------------------------------------
+    // UPDATE : La logique du jeu (aucun dessin ici)
+    // ----------------------------------------------------------------
+    update(dt) {
+        this.#handleGlobalInput();
+ 
+        // Quand le jeu n'est pas en cours (pause, fin de partie), plus rien ne bouge : c'est ce simple if qui réalise la pause
+        if(this.#state === GameState.PLAYING) {
+            this.#updatePlaying(dt);
+        }
+ 
+        // Ce qui vient d'être pressé ne vaut que pour cette image
+        this.#input.endFrame();
     }
 
     /**
      * Tout ce qui se passe pendant qu'on joue. L'ORDRE compte :
      * On déplace tout, puis on teste
-     */
-    #updatePlaying(dt) {
-        this.#updatePlayer(dt);
-        this.#projectiles.update(dt);
-        this.#enemies.update(dt, CANVAS_WIDTH);
-        this.#explosions.update(dt);
-        this.updateEnemyShooting(dt);
-
-        this.#handleCollisions();
-        this.#checkEndOfGame();
+    */
+   #updatePlaying(dt) {
+       this.#updatePlayer(dt);
+       this.#projectiles.update(dt);
+       this.#enemies.update(dt, CANVAS_WIDTH);
+       this.#explosions.update(dt);
+       this.updateEnemyShooting(dt);
+       
+       this.#handleCollisions();
+       this.#checkEndOfGame();
     }
-
+    
     /**
      * Déplace le joueur et gère ses tirs selon les commandes reçues
      */
