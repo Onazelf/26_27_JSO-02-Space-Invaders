@@ -30,7 +30,7 @@ export class EnemyManager {
     }
 
     /**
-     * Tous les ennemis sont-ils détruit ? (condition de victoire)
+     * Tous les ennemis sont-ils détruit ? (condition pour passer au boss)
      * @returns {boolean}
      */
     get isCleared() {

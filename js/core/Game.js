@@ -25,6 +25,7 @@ export class Game {
     #hud = new HUD();
     #projectiles;
     #enemies;
+    #boss = null;
     #explosions;
 
     // --- Etats de la partie ---
@@ -35,6 +36,7 @@ export class Game {
     #score = 0;
     #enemyShootTimer = 0; // Compte à rebours avant le prochain tir ennemi
     #lastFrameTime = 0; // Horodatage de la dernière frame (pour calculer dt)
+    #bossSpawned = false // Permet de savoir si le boss a été invoqué
 
     /**
      * Les objets dont Game a besoin lui sont passés en paramètres
@@ -65,6 +67,8 @@ export class Game {
         this.#level = level;
         this.#ship = ship;
         this.#score = 0;
+        this.#boss = null;
+        this.#bossSpawned = false;
         this.#enemyShootTimer = level.shootInterval;
 
         // On réinitialise avant d'instancier
@@ -201,6 +205,13 @@ export class Game {
             return; // Pas encore le moment de tirer
         }
 
+        // Si le boss est à l'écran, c'est lui qui tire
+        if(this.#boss) {
+            this.#projectiles.createEnemyBullet(this.#boss);
+            this.#sound.play("enemyShot", 0.5);
+        }
+
+        // Sinon, c'est les ennemis
         const shooters = this.#enemies.getShooters();
 
         if(shooters.length > 0) {
@@ -213,6 +224,21 @@ export class Game {
         }
 
         this.#enemyShootTimer = this.#level.shootInterval; // On relance le compte à rebours
+    }
+
+    /**
+     * Gère l'apparition du boss, si il est apparu on l'affiche, sinon on le masque (fin de partie, ou phase de grille avec les ennemis)
+     */
+    updateBossState() {
+        // Si tous les aliens sont morts, on fait apparaître le boss
+        if (this.#enemies.isCleared && !this.#bossSpawned) {
+            this.#spawnBoss();
+        }
+
+        // Seulement si le boss est actif, on le met à jour
+        if (this.#boss) {
+            this.#boss.update(dt, CANVAS_WIDTH);
+        }
     }
 
     // ----------------------------------------------------------------
@@ -233,6 +259,21 @@ export class Game {
     #handlePlayerBulletHitEnemies() {
         // playerBullets et enemies renvoient des copies : on peut donc supprimer dans les vrais tableaux pendant qu'on parcourt les copies sans rien casser
         for(const bullet of this.#projectiles.playerBullets) {
+
+            if (this.#boss && this.#collisions.isColliding(bullet, this.#boss)) {
+                this.#projectiles.removeEnemyBullet(bullet);
+            }
+
+            const isDead = this.#boss.takeHit(bullet.damage);
+            this.#sound.play("hit", 0.6);
+
+            if(isDead) {
+                this.#score += this.#boss.bossPoints;
+                this.#explosions.spawn(this.#boss.centerX, this.#boss.centerY);
+                this.#sound.play("bossDeath", 0.9);
+                this.#boss = null
+            }
+
             const enemy = this.#collisions.findFirstCollision(bullet, this.#enemies.enemies);
 
             if(!enemy) {
@@ -304,7 +345,7 @@ export class Game {
             return;
         }
 
-        if(this.#enemies.isCleared) {
+        if(this.#enemies.isCleared && !this.#boss) {
             this.#state = GameState.VICTORY;
             this.#sound.play("victory");
         }
@@ -337,6 +378,7 @@ export class Game {
         // Fond => Joueur => Ennemis => Tirs => Explosions => Interface => Overlays
         this.#player.draw(ctx);
         this.#enemies.draw(ctx);
+        if(this.#boss) this.#boss.draw(ctx);
         this.#projectiles.draw(ctx);
         this.#explosions.draw(ctx);
 
@@ -347,5 +389,10 @@ export class Game {
             shipSprite: this.#assetLoader.get(this.#ship.id)
         });
         this.#hud.drawOverlay(ctx, this.#state, this.#score);
+    }
+
+    #spawnBoss() {
+        this.#bossSpawned = true;
+        this.#sound.play("bossArrive", 0.8);
     }
 }

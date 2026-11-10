@@ -10,7 +10,6 @@ import { ENEMY_SIZE } from "../core/constants.js";
 import { Entity } from "./Entity.js";
 
 /**
- * 
  * @param {number} x
  * @param {number} y
  * @param {HTMLImageElement|null} sprite
@@ -21,7 +20,7 @@ export class Enemy extends Entity{
     constructor(x, y, sprite, points, column) {
         // La taille est la même pour tous les aliens: on utilise les constantes
         super(x, y, ENEMY_SIZE, ENEMY_SIZE, sprite, "#66ff66");
-
+        
         this.points = points;
         this.column = column;
         this.hp = 1; // Un alien "normal" meurt au premier contact avec un projectile
