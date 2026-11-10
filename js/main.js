@@ -2,9 +2,8 @@
  * main.js est notre point d'entrée javascript (c'est le seul fichier chargé par index.html)
  * tous les autres fichiers js seront importés en cascade grâce aux "import"
  * 
- * Son rôle : préparer les ressouces, créer le jeu, le lancer. Il n'y aura aucune logique de jeu ici
+ * Son rôle : préparer les ressources, créer le jeu, le lancer. Il n'y aura aucune logique de jeu ici
  */
-
 // --- Imports ---
 import { AssetLoader } from "./core/AssetLoader.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./core/constants.js";
@@ -44,6 +43,7 @@ async function main() {
         status.textContent = "";
 
     } catch (e) {
+        // Si le jeu ne se charge pas correctement, on affiche une erreur à l'écran
         status.textContent = `Erreur au chargement du jeu : ${e.message}`;
         console.log(e);
     }

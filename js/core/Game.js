@@ -80,7 +80,7 @@ export class Game {
             computeShipAttributes(ship.stats)
         );
 
-        this.#state = GameState.PLAYING;
+        this.#state = GameState.MAIN_MENU;
     }
 
     /**
@@ -109,7 +109,11 @@ export class Game {
      * Touches qui marchent quel que soit l'état: son, pause, rejouer...
     */
    #handleGlobalInput() {
-       if(this.#input.wasPressed("KeyM")) {
+        if(this.#input.wasPressed("Enter") && this.#state === GameState.MAIN_MENU) {
+            this.#state = GameState.PLAYING;
+        }
+
+        if(this.#input.wasPressed("KeyM")) {
             this.#sound.toggleMute();
         }
         
@@ -122,7 +126,7 @@ export class Game {
             this.#state = GameState.PLAYING;
         }
 
-        const isFinished = this.#state === GameState.VICTORY || GameState.GAME_OVER;
+        const isFinished = this.#state === GameState.VICTORY || this.#state === GameState.GAME_OVER;
         
         if(this.#input.wasPressed("KeyR") && isFinished) {
             this.startLevel(this.#level, this.#ship);

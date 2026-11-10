@@ -82,7 +82,10 @@ export class HUD {
 
         // Voile sombre sur toute la scène (qui reste visible en dessous)
         // Si l'overlay affiché est le menu principal, rend le fond complètement opaque
-        overlay.MAIN_MENU ? ctx.fillStyle = "rgb(15, 15, 15)" : ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+        ctx.fillStyle = (state === GameState.MAIN_MENU) 
+        ? "rgb(9, 9, 9)" 
+        : "rgba(0, 0, 0, 0.6)";
+
         ctx.fillRect(0, 0, width, height);
 
         this.#drawText(ctx, overlay.title, width / 2, height / 2 - 40, {
