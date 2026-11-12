@@ -59,6 +59,15 @@ export class HUD {
         }
     }
 
+    /**
+     * Méthode qui sert à dessiner du texte
+     * 
+     * @param {CanvasRenderingContext2D} ctx 
+     * @param {string} text 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {object} objectAttribute
+     */
     #drawText(ctx, text, x, y, { size = 16, color = "#ffffff", align = "left", bold = false } = {} ) {
         ctx.fillStyle = color;
         ctx.font = `${bold ? "bold" : ""} ${size}px monospace`;
@@ -113,5 +122,43 @@ export class HUD {
                 align: "center"
             })
         });
+    }
+
+    /**
+     * Méthode qui permet d'afficher la barre de vie du boss en temps réel
+     * 
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {object} state Etat actuel du jeu 
+     * @param {number} hp PV actuels du boss
+     * @param {number} maxHp PV max du boss
+     * @param {string} bossName nom du boss à afficher
+     */
+    drawHealthBar(ctx, hp, maxHp, bossName) {
+        const width = ctx.canvas.width;
+
+        // On dessine le nom du boss
+        this.#drawText(ctx, bossName, width / 2, 35, {
+            size : 18,
+            color : "#b6b6b6",
+            align : "center",
+            bold : true 
+        });
+
+        // Puis on dessine la barre de vie
+        // On crée des constantes si jamais on veut changer la taille de la barre de vie
+        const healthBarWidth = 300;
+        const healthBarHeight = 30;
+        // Cela permet de centrer la barre sur l'axe X
+        const barX = width / 2 - healthBarWidth / 2
+
+        // La barre rouge se construit sur toute la longueur initiale
+        ctx.fillStyle = "rgb(212, 35, 35)";
+        ctx.fillRect(barX, 55, healthBarWidth, healthBarHeight);
+
+        // La barre verte se construit en fonction du ratio de PV restants du boss (proportionnelle a la taille de la barre rouge) car c'est celle qui se réduit
+        // On utilise un Math.max pour éviter toute valeur négative
+        const ratio = Math.max(0, hp / maxHp);
+        ctx.fillStyle = "rgb(70, 224, 70)";
+        ctx.fillRect(barX, 55, healthBarWidth - ratio, healthBarHeight);
     }
 }

@@ -7,6 +7,7 @@
  * - name : le nom du niveau
  * - rows : un sprite d'alien par rangée (de la plus haute à la plus basse)
  * - boss : un sprite de boss unique par niveau
+ * - bossName : le nom du boss qui s'affiche au dessus de la barre de vie
  * - points : point rapporté par rangée (même ordre que les rows)
  * - bossPoints : les points attribués à la mort du boss
  * - columns : nombre d'alien par rangée
@@ -20,13 +21,14 @@
 export const LEVELS = [
     {
         id: 1,
-        name: "Premier contact",
+        name: "Niveau 1 : Premier contact",
         rows: ["alien1", "alien2", "alien3"],
         boss: "boss1",
+        bossName: "Trivex - Incarnation du masque fantôme",
         points: [30, 20, 10],
         bossPoints: 80,
         bossHP : 20,
-        columns: 14,
+        columns: 9,
         enemySpeed: 70,
         stepDown: 20,
         shootInterval: 1.1,

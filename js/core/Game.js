@@ -347,7 +347,6 @@ export class Game {
     // ----------------------------------------------------------------
     #checkEndOfGame() {
         // Invasion : Le bas des aliens est arrivé à la hauteur du vaisseau
-        console.log(this.#enemies.lowestBottom)
         const hasBeenInvaded = this.#enemies.lowestBottom >= this.#player.y;
 
         // On teste la défaite avant la victoire
@@ -382,6 +381,7 @@ export class Game {
      */
     render() {
         const ctx = this.#ctx;
+        const boss = this.#boss.boss;
         // On efface tout pour reconstruire
         ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
         this.#drawBackground();
@@ -400,6 +400,10 @@ export class Game {
             levelName: this.#level.name,
             shipSprite: this.#assetLoader.get(this.#ship.id)
         });
+
+        // Si un boss existe et que l'on joue, on affiche sa barre de vie et son nom
+        if(boss && this.#state === GameState.PLAYING) this.#hud.drawHealthBar(ctx, boss.hp, boss.maxHp, this.#level.bossName);
+        
         this.#hud.drawOverlay(ctx, this.#state, this.#score);
     }
 }

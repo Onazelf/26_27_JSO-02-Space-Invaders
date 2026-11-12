@@ -40,8 +40,8 @@ export const ENEMY_GAP_Y = 58; // Distance entre 2 rangées
 export const ENEMY_START_Y = 80; // Position verticale de la première rangée
 
 // --- Boss ---
-export const BOSS_SIZE = 62;
-export const BOSS_Y = 75;
+export const BOSS_SIZE = 90;
+export const BOSS_Y = 100;
 
 // --- Explosions ---
 export const EXPLOSION_DURATION = 0.45;

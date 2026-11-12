@@ -21,7 +21,8 @@ export class Boss extends Entity {
         super(x, y, BOSS_SIZE, BOSS_SIZE, sprite, "#66ff66");
 
         this.points = points;
-        this.hp = hp; // Un boss ne meurt pas du premier coup
+        this.hp = hp;
+        this.maxHp = hp; // Un boss ne meurt pas du premier coup, il dispose alors de PV max
     }
 
     /**
