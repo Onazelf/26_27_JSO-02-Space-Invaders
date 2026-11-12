@@ -1,8 +1,9 @@
 /**
  * Touches que le jeu utilise
+ * 
  * On va devoir enlever le comportement naturel du navigateur (flèche du bas, faire défiler la page, etc) => on va utiliser preventDefault()
  */
-const GAME_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Space", "Enter"])
+const GAME_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Space", "Enter"]);
 
 /**
  * Mémorise l'état du clavier

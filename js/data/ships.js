@@ -2,6 +2,7 @@
  * On définit nos vaisseaux jouables
  * 
  * Dans la version du cours, seul DEFAULT_SHIP est utilisé (car pas de menu)
+ * Dans la version finale, un menu sélection sera disponible pour choisir entre plusieurs vaisseaux
  */
 export const SHIPS = [
     { id: "jet1", name: "Aurora", tagline: "Equilibré, idéal pour débuter", stats: { speed: 3, power: 3, armor: 4 } },

@@ -1,5 +1,6 @@
 /**
  * Le vaisseau du joueur
+ * 
  * Pour cette classe on va utiliser le principe d'encapsulation
 */
 import { INVINCIBILITY_DURATION, PLAYER_SIZE } from "../core/constants.js";

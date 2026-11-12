@@ -1,24 +1,17 @@
 /**
- * Gestion du boss : récupère les propriétés du boss depuis Boss.js et définit l'attaque spéciale de celui-ci.
+ * Gestion du boss : récupère les propriétés du boss depuis Boss.js
 */
 import { BOSS_SIZE, BOSS_Y, CANVAS_WIDTH } from "../core/constants.js";
 import { Boss } from "../entities/Boss.js";
 
 export class BossManager {
     #assetLoader;
-    #boss = null;
-    #direction = 1;
-    #baseSpeed = 0;
+    #boss = null; // Initialise une variable boss vide, pour la remplir plus tard
+    #direction = 1; // 1 vers la droite, -1 vers la gauche
+    #baseSpeed = 0; // Vitesse de départ du niveau (px/s)
 
     constructor(assetLoader) {
         this.#assetLoader = assetLoader;
-    }
-
-    /**
-     * Récupère l'information du boss éliminé, retourne sa valeur à null
-     */
-    get bossIsCleared() {
-        return this.#boss === null;
     }
 
     /**
@@ -28,10 +21,22 @@ export class BossManager {
         return this.#boss;
     }
 
+    /**
+     * Récupère l'information du boss éliminé
+     * @returns {boolean}
+     */
+    get isCleared() {
+        return this.#boss === null;
+    }
+
+    /**
+     * Crée le boss décrit dans levels.js
+     * Aucune valeur propre a un niveau est écrite ici : tout viens de levels.js
+     */
     spawn(level) {
         this.#boss = null;
         this.#direction = 1;
-        this.#baseSpeed = level.enemySpeed;
+        this.#baseSpeed = level.enemySpeed * 2;
 
         const sprite = this.#assetLoader.get(level.boss)
 
@@ -39,7 +44,8 @@ export class BossManager {
             CANVAS_WIDTH / 2 - BOSS_SIZE / 2,
             BOSS_Y,
             sprite,
-            level.bossPoints
+            level.bossPoints,
+            level.bossHP
         );
     }
 
@@ -58,6 +64,7 @@ export class BossManager {
      * @returns {void}
      */
     update(dt, canvasWidth) {
+        // Si il n'y a pas de boss, on n'update rien
         if(!this.#boss) {
             return;
         }

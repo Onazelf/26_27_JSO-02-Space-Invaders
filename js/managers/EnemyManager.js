@@ -11,7 +11,7 @@ import { Enemy } from "../entities/Enemy.js";
 
 export class EnemyManager {
     #assetLoader;
-    #enemies = [];
+    #enemies = []; // Initialise un tableau d'ennemis vide, pour le remplir plus tard
     #direction = 1; // 1 vers la droite, -1 vers la gauche
     #baseSpeed = 0; // Vitesse de départ du niveau (px/s)
     #stepDown = 0; // Descente a chaque demi-tour (px)
@@ -32,20 +32,33 @@ export class EnemyManager {
     /**
      * Tous les ennemis sont-ils détruit ? (condition pour passer au boss)
      * @returns {boolean}
-     */
-    get isCleared() {
-        return this.#enemies.length === 0;
+    */
+   get isCleared() {
+       return this.#enemies.length === 0;
     }
-
+    
     /**
      * Position du bas de l'ennemi le plus bas (sert à détecter l'invasion)
      * reduce : parcourt le tableau en gardant un cumul : ici, le plus grand `bottom` rencontré jusque là (on part de 0)
      * @returns {number}
-     */
-    get lowestBottom() {
-        return this.#enemies.reduce( (lowest, enemy) => Math.max(lowest, enemy.lowestBottom), 0);
+    */
+   get lowestBottom() {
+        return this.#enemies.reduce( (lowest, enemy) => Math.max(lowest, enemy.bottom), 0);
     }
+    
+    /**
+     * Vitesse actuelle : de x1 (grille pleine) jusqu'à x3 (dernier ennemi)
+     * destroyRatio va de 0 (aucun détruit) à 1 (tout est détruit)
+     */
+    get currentSpeed() {
+        if(this.#initialCount === 0) {
+            return this.#baseSpeed;
+        }
 
+        const destroyRatio = 1 - this.#enemies.length / this.#initialCount;
+        return this.#baseSpeed * (1 + 2 * destroyRatio);
+    }
+    
     /**
      * Crée la grille d'ennemis décrite par un niveau (voir : data/levels.js)
      * Aucune valeur propre a un niveau est écrite ici : tout viens de level.js
@@ -55,6 +68,7 @@ export class EnemyManager {
         this.#direction = 1;
         this.#baseSpeed = level.enemySpeed;
         this.#stepDown = level.stepDown;
+        // On fait en sorte que la grille d'ennemis ne dépasse pas 14 sinon ça les fait tomber sur le joueur instantanément
         const countEnemies = level.columns <= 14 ? level.columns : 14;
 
         // Largeur totale de la grille : (n-1) écarts entre les ennemis + la largeur du dernier
@@ -83,18 +97,6 @@ export class EnemyManager {
         this.#initialCount = this.#enemies.length;
     }
 
-    /**
-     * Vitesse actuelle : de x1 (grille pleine) jusqu'à x3 (dernier ennemi)
-     * destroyRatio va de 0 (aucun détruit) à 1 (tout est détruit)
-     */
-    get currentSpeed() {
-        if(this.#initialCount === 0) {
-            return this.#baseSpeed;
-        }
-
-        const destroyRatio = 1 - this.#enemies.length / this.#initialCount;
-        return this.#baseSpeed * (1 + 2 * destroyRatio);
-    }
 
     /**
      * Méthode pour supprimer un ennemi

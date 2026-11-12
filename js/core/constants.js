@@ -6,7 +6,6 @@
  * 
  * Unités : toutes les vitesses sont en PIXEL/SECONDE (px/s) et toutes les durées sont en SECONDES. Le jeu utilise un "delta time: (dt) : le déplacement d'une entité vaut vitesse dt. Ainsi le jeu va à la même vitesse sur un écran 60Hz et sur un écran 144Hz"
  */
-
 // --- Canvas ---
 export const CANVAS_WIDTH = 1024;
 export const CANVAS_HEIGHT = 768;
@@ -41,7 +40,7 @@ export const ENEMY_GAP_Y = 58; // Distance entre 2 rangées
 export const ENEMY_START_Y = 80; // Position verticale de la première rangée
 
 // --- Boss ---
-export const BOSS_SIZE = 62
+export const BOSS_SIZE = 62;
 export const BOSS_Y = 75;
 
 // --- Explosions ---

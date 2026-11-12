@@ -1,10 +1,12 @@
-// On recense tous les assets
+// On recense ici tous les assets
 
 import { SHIPS } from "./ships.js";
 
+// Recense le nombre d'aliens et de boss dans les assets, nombre sujet à changement si des assets sont ajoutés ou retirés
 const ALIEN_COUNT = 13;
 const BOSS_COUNT = 8;
 
+// Fonction qui détermine le chemin d'accès des assets du jeu
 export function buildImagePath() {
     const paths = {
         background: "./assets/images/fond.png",
@@ -15,10 +17,11 @@ export function buildImagePath() {
         powerupShield: "./assets/images/effects/powerup-shield.png",
     };
 
+    // Parcourt le tableau des vaisseaux et fait varier le chemin d'accès en fonction de l'ID du vaisseau
     for(const ship of SHIPS) {
         paths[ship.id] = `./assets/images/jet/${ship.id}.png`
     };
-
+    
     for(let index = 1; index <= ALIEN_COUNT; index++) {
         paths[`alien${index}`] = `./assets/images/aliens/alien${index}.png`
     };
@@ -38,6 +41,7 @@ export const SOUND_PATHS = {
     hit: './assets/sounds/hit.wav',
     gameOver: './assets/sounds/game-over.wav',
     victory: './assets/sounds/victory.wav',
+    
     // Pour les exercices :
     menuSelect: './assets/sounds/menu-select.wav',
     bossArrive: './assets/sounds/boss-arrive.wav',

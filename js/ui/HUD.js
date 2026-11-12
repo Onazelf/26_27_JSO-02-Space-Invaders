@@ -88,6 +88,7 @@ export class HUD {
 
         ctx.fillRect(0, 0, width, height);
 
+        // Positionne correctement le texte
         this.#drawText(ctx, overlay.title, width / 2, height / 2 - 40, {
             size: 56,
             color: overlay.color,

@@ -8,8 +8,15 @@
 import { BOSS_SIZE } from "../core/constants.js";
 import { Entity } from "./Entity.js";
 
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {HTMLImageElement|null} sprite
+ * @param {number} points points rapportés quand le boss est détruit
+ * @param {number} hp points de vies du boss
+ */
 export class Boss extends Entity {
-    constructor(x, y, sprite, points, hp = 20) {
+    constructor(x, y, sprite, points, hp) {
         // La taille du boss est différente des aliens, il est plus grand
         super(x, y, BOSS_SIZE, BOSS_SIZE, sprite, "#66ff66");
 
@@ -17,6 +24,13 @@ export class Boss extends Entity {
         this.hp = hp; // Un boss ne meurt pas du premier coup
     }
 
+    /**
+     * Applique les DGT
+     * @param {number} damage par défaut = 1
+     * @returns {boolean}
+     * 
+     * La méthode ne supprime pas le boss, elle se contente de dire si il est détruit ou non. C'est Game qui décide des conséquences (score, explosion)
+     */
     takeHit(damage = 1) {
         this.hp -= damage;
         return this.hp <= 0;

@@ -1,14 +1,15 @@
 /**
- * Chef d'orchestre du jeu
+ * Chef d'orchestre du jeu, il décide de tout
 */
 import { computeShipAttributes } from "../data/ships.js";
 import { Player } from "../entities/Player.js";
+import { BossManager } from "../managers/BossManager.js";
 import { CollisionManager } from "../managers/CollisionManager.js";
 import { EnemyManager } from "../managers/EnemyManager.js";
 import { ExplosionManager } from "../managers/ExplosionManager.js";
 import { ProjectileManager } from "../managers/ProjectileManager.js";
 import { HUD } from "../ui/HUD.js";
-import { CANVAS_WIDTH, MAX_DELTA_TIME, PLAYER_SIZE, PLAYER_Y } from "./constants.js";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, MAX_DELTA_TIME, PLAYER_SIZE, PLAYER_Y } from "./constants.js";
 import { GameState } from "./GameState.js";
 import { InputManager } from "./InputManager.js";
 
@@ -25,7 +26,7 @@ export class Game {
     #hud = new HUD();
     #projectiles;
     #enemies;
-    #boss = null;
+    #boss;
     #explosions;
 
     // --- Etats de la partie ---
@@ -36,7 +37,7 @@ export class Game {
     #score = 0;
     #enemyShootTimer = 0; // Compte à rebours avant le prochain tir ennemi
     #lastFrameTime = 0; // Horodatage de la dernière frame (pour calculer dt)
-    #bossSpawned = false // Permet de savoir si le boss a été invoqué
+    #bossSpawned = false; // Permet de savoir si le boss a été invoqué
 
     /**
      * Les objets dont Game a besoin lui sont passés en paramètres
@@ -49,9 +50,10 @@ export class Game {
         this.#assetLoader = assetLoader;
         this.#sound = soundManager;
 
-        this.#projectiles = new ProjectileManager(assetLoader, CANVAS_WIDTH);
-        this.#enemies = new EnemyManager(assetLoader);
-        this.#explosions = new ExplosionManager(assetLoader.get("explosion"))
+        this.#projectiles = new ProjectileManager(assetLoader, CANVAS_HEIGHT);
+        this.#enemies = new EnemyManager(assetLoader); // this.#enemies correspond au Manager des ennemis utilisé plus tard dans le code
+        this.#boss = new BossManager(assetLoader); // this.#boss correspond au Manager des boss utilisé plus tard dans le code
+        this.#explosions = new ExplosionManager(assetLoader.get("explosion"));
     }
 
     // ----------------------------------------------------------------
@@ -61,20 +63,20 @@ export class Game {
      * Initialiser une partie sur un niveau, avec un vaisseau donné
      * On l'appelle au démarrage ET à chaque "Rejouer" : tout est remis à zéro
      * @param {object} level voir data/levels.js
-     * @@param {object} ship voir data/ships.js
+     * @param {object} ship voir data/ships.js
      */
     startLevel(level, ship) {
         this.#level = level;
         this.#ship = ship;
         this.#score = 0;
-        this.#boss = null;
         this.#bossSpawned = false;
         this.#enemyShootTimer = level.shootInterval;
-
+        
         // On réinitialise avant d'instancier
         this.#projectiles.clear();
         this.#explosions.clear();
         this.#enemies.spawn(level);
+        this.#boss.clear();
 
         // Le joueur est créé centré en bas de l'écran, avec les attributs du vaisseau
         this.#player = new Player(
@@ -83,40 +85,49 @@ export class Game {
             this.#assetLoader.get(ship.id),
             computeShipAttributes(ship.stats)
         );
-
+        
         this.#state = GameState.MAIN_MENU;
     }
 
     /**
      * Permet de démarrer la boucle de jeu
-     */
-    start() {
-        // performance.now() renvoie un temps précis en milliseconde depuis le début du contexte
-        // On le mémorise pour calculer la durée écoulée entre 2 images
-        this.#lastFrameTime = performance.now();
-
-        const loop = (now) => {
-            // dt = temps écoulé depuis la dernière image (s)
-            // Le plafond (Math.min) évite un énorme saut quand l'onglet est resté longtemps en arrière-plan
-            const dt = Math.min( (now - this.#lastFrameTime) / 1000, MAX_DELTA_TIME);
-
-            this.#lastFrameTime = now;
-            this.update(dt); // On calcule le nouvel état du jeu
-
-            this.render(); // On dessine cet état
-            requestAnimationFrame(loop);
+    */
+   start() {
+       // performance.now() renvoie un temps précis en milliseconde depuis le début du contexte
+       // On le mémorise pour calculer la durée écoulée entre 2 images
+       this.#lastFrameTime = performance.now();
+       
+       const loop = (now) => {
+           // dt = temps écoulé depuis la dernière image (s)
+           // Le plafond (Math.min) évite un énorme saut quand l'onglet est resté longtemps en arrière-plan
+           const dt = Math.min( (now - this.#lastFrameTime) / 1000, MAX_DELTA_TIME);
+           
+           this.#lastFrameTime = now;
+           this.update(dt); // On calcule le nouvel état du jeu
+           
+           this.render(); // On dessine cet état
+           requestAnimationFrame(loop);
         }
         requestAnimationFrame(loop);
     }
 
     /**
+     * Permet de faire apparaître le boss et de jouer le son de son arrivée
+     */
+    #spawnBoss() {
+        this.#boss.spawn(this.#level);
+        this.#bossSpawned = true;
+        this.#sound.play("bossArrive", 0.8);
+    }
+    
+    /**
      * Touches qui marchent quel que soit l'état: son, pause, rejouer...
     */
-   #handleGlobalInput() {
+    #handleGlobalInput() {
         if(this.#input.wasPressed("Enter") && this.#state === GameState.MAIN_MENU) {
             this.#state = GameState.PLAYING;
         }
-
+        
         if(this.#input.wasPressed("KeyM")) {
             this.#sound.toggleMute();
         }
@@ -156,15 +167,24 @@ export class Game {
      * Tout ce qui se passe pendant qu'on joue. L'ORDRE compte :
      * On déplace tout, puis on teste
     */
-   #updatePlaying(dt) {
-       this.#updatePlayer(dt);
-       this.#projectiles.update(dt);
-       this.#enemies.update(dt, CANVAS_WIDTH);
-       this.#explosions.update(dt);
-       this.updateEnemyShooting(dt);
-       
-       this.#handleCollisions();
-       this.#checkEndOfGame();
+    #updatePlaying(dt) {
+        this.#updatePlayer(dt);
+        this.#projectiles.update(dt);
+        this.#enemies.update(dt, CANVAS_WIDTH);
+
+        if(this.#enemies.isCleared && !this.#bossSpawned) {
+            this.#spawnBoss();
+        }
+        
+        // Si on ne sort pas cette appel de méthode du if juste au dessus, le boss ne bougera jamais car !this.#bossSpawned renverra toujours false après son apparition
+        // De plus, update return si il n'y a pas de boss, donc elle n'agit pas tant que le boss n'est pas apparu
+        this.#boss.update(dt, CANVAS_WIDTH);
+
+        this.#explosions.update(dt);
+        this.updateEnemyShooting(dt);
+        
+        this.#handleCollisions();
+        this.#checkEndOfGame();
     }
     
     /**
@@ -196,7 +216,7 @@ export class Game {
 
     /**
      * Les ennemis tirent à intervalles réguliers
-     * Un compte à rebours diminue avec dt, ça doit respecter l'écran de pause : quand le jeu est en pause, update n'est pas appelé, le compteur est donc gelé
+     * Un compte à rebours diminue avec dt, et doit respecter l'écran de pause : quand le jeu est en pause, update n'est pas appelé, le compteur est donc gelé
      */
     updateEnemyShooting(dt) {
         this.#enemyShootTimer -= dt;
@@ -205,10 +225,13 @@ export class Game {
             return; // Pas encore le moment de tirer
         }
 
+        const boss = this.#boss.boss;
         // Si le boss est à l'écran, c'est lui qui tire
-        if(this.#boss) {
-            this.#projectiles.createEnemyBullet(this.#boss);
+        if(boss) {
+            this.#projectiles.createEnemyBullet(boss);
             this.#sound.play("enemyShot", 0.5);
+            this.#enemyShootTimer = this.#level.bossShootInterval;
+            return;
         }
 
         // Sinon, c'est les ennemis
@@ -226,21 +249,6 @@ export class Game {
         this.#enemyShootTimer = this.#level.shootInterval; // On relance le compte à rebours
     }
 
-    /**
-     * Gère l'apparition du boss, si il est apparu on l'affiche, sinon on le masque (fin de partie, ou phase de grille avec les ennemis)
-     */
-    updateBossState() {
-        // Si tous les aliens sont morts, on fait apparaître le boss
-        if (this.#enemies.isCleared && !this.#bossSpawned) {
-            this.#spawnBoss();
-        }
-
-        // Seulement si le boss est actif, on le met à jour
-        if (this.#boss) {
-            this.#boss.update(dt, CANVAS_WIDTH);
-        }
-    }
-
     // ----------------------------------------------------------------
     // COLLISIONS: CollisionManager DETECTE et Game DECIDE
     // ----------------------------------------------------------------
@@ -254,24 +262,28 @@ export class Game {
     }
 
     /**
-     * Gère les tirs du joueur qui touchent les ennemis et leur attribue les DGT
+     * Gère les tirs du joueur qui touchent les ennemis et le boss et leur attribue les DGT
      */
     #handlePlayerBulletHitEnemies() {
         // playerBullets et enemies renvoient des copies : on peut donc supprimer dans les vrais tableaux pendant qu'on parcourt les copies sans rien casser
         for(const bullet of this.#projectiles.playerBullets) {
 
-            if (this.#boss && this.#collisions.isColliding(bullet, this.#boss)) {
-                this.#projectiles.removeEnemyBullet(bullet);
-            }
+            // On définit une constante boss pour ne pas réécrire trop de fois this.#boss.boss
+            const boss = this.#boss.boss;
+            // Même chose pour isDead
+            
+            if(boss && this.#collisions.isColliding(bullet, boss)) {
+                const isDead = boss.takeHit(bullet.damage);
+                this.#projectiles.removePlayerBullet(bullet);
+                this.#sound.play("hit", 0.6);
 
-            const isDead = this.#boss.takeHit(bullet.damage);
-            this.#sound.play("hit", 0.6);
-
-            if(isDead) {
-                this.#score += this.#boss.bossPoints;
-                this.#explosions.spawn(this.#boss.centerX, this.#boss.centerY);
-                this.#sound.play("bossDeath", 0.9);
-                this.#boss = null
+                // Puisque le boss ne se fait pas éliminer en un seul tir il faut vérifier si il est mort avec isDead et n'appliquer l'explosion, le score et le son de mort qu'une seule fois et pas à chaque tirs du joueur
+                if(isDead) {
+                    this.#score += this.#boss.boss.points;
+                    this.#explosions.spawn(this.#boss.boss.centerX, this.#boss.boss.centerY);
+                    this.#sound.play("bossDeath", 0.9);
+                    this.#boss.clear();
+                }
             }
 
             const enemy = this.#collisions.findFirstCollision(bullet, this.#enemies.enemies);
@@ -304,7 +316,6 @@ export class Game {
         // Le tir est consommé dans tout les cas ; même si le joueur est invincible
         this.#projectiles.removeEnemyBullet(bullet);
         this.#damagePlayer();
-
     }
 
     /**
@@ -336,6 +347,7 @@ export class Game {
     // ----------------------------------------------------------------
     #checkEndOfGame() {
         // Invasion : Le bas des aliens est arrivé à la hauteur du vaisseau
+        console.log(this.#enemies.lowestBottom)
         const hasBeenInvaded = this.#enemies.lowestBottom >= this.#player.y;
 
         // On teste la défaite avant la victoire
@@ -345,7 +357,7 @@ export class Game {
             return;
         }
 
-        if(this.#enemies.isCleared && !this.#boss) {
+        if(this.#enemies.isCleared && this.#boss.isCleared && this.#bossSpawned) {
             this.#state = GameState.VICTORY;
             this.#sound.play("victory");
         }
@@ -375,10 +387,10 @@ export class Game {
         this.#drawBackground();
 
         // L'ORDRE DES DESSINS compte : ce qui est dessiné en dernier apparaît par dessus (calques)
-        // Fond => Joueur => Ennemis => Tirs => Explosions => Interface => Overlays
+        // Fond => Joueur => Ennemis => Boss => Tirs => Explosions => Interface => Overlays
         this.#player.draw(ctx);
         this.#enemies.draw(ctx);
-        if(this.#boss) this.#boss.draw(ctx);
+        this.#boss.draw(ctx);
         this.#projectiles.draw(ctx);
         this.#explosions.draw(ctx);
 
@@ -389,10 +401,5 @@ export class Game {
             shipSprite: this.#assetLoader.get(this.#ship.id)
         });
         this.#hud.drawOverlay(ctx, this.#state, this.#score);
-    }
-
-    #spawnBoss() {
-        this.#bossSpawned = true;
-        this.#sound.play("bossArrive", 0.8);
     }
 }

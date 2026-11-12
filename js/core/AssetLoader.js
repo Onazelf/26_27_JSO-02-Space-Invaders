@@ -2,7 +2,7 @@
  * Chargement des images
  * 
  * POURQUOI charger AVANT de jouer ? Une image met un petit moment à se charger du disque ou du réseau
- * Si on essaye de dessiner trop tôt, rien qui s'affiche.
+ * Si on essaye de dessiner trop tôt, rien ne s'affiche.
  * Et on ne crée JAMAIS new Image() dans la boucle de rendu (60 fois par seconde !)
  * On charge tout une fois au départ, puis on réutilise
  */
@@ -20,7 +20,7 @@ export class AssetLoader {
         // Object.entries({a:1, b:2}) donne [["a", 1], ["b", 2]]
         const entries = Object.entries(paths);
 
-        await Promise.all( entries.map(([key, src]) => this.#loadImage(key, src)) )
+        await Promise.all( entries.map(([key, src]) => this.#loadImage(key, src)) );
     }
 
     /**
@@ -35,7 +35,7 @@ export class AssetLoader {
                 resolve();
             }
             
-            image.onerror = () => reject(new Error(`Image introuvable : ${src}`))
+            image.onerror = () => reject(new Error(`Image introuvable : ${src}`));
             image.src = src; // C'est cette ligne qui déclenche le téléchargement
         } )
     }

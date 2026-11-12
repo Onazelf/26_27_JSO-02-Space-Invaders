@@ -6,6 +6,7 @@
  * PAUSED : rien ne bouge et on affiche pause
  * GAME_OVER : plus de vie => écran de défaite
  * VICTORY : tous les aliens sont détruits => écran de victoire
+ * MAIN_MENU : Menu principal
  * 
  * Pourquoi un objet de constante plutôt que d'écrire "playing" partout ?
  * Une faute de frappe dans une chaine ("playin") ne provoque aucune erreur et le bug va être difficile à trouver. Avec GameState.PLAYING, une faute de frappe donne undefined et se voit tout de suite
@@ -21,4 +22,4 @@ export const GameState = Object.freeze({
     GAME_OVER: "gameover",
     VICTORY: "victory",
     MAIN_MENU: "main-menu"
-})
+});

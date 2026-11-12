@@ -1,7 +1,7 @@
 /**
  * Classe pour définir les projectiles.
  * 
- * Il sert au joueur ET aux ennemis : seule la DIRECTION change
+ * Il sert au joueur, aux ennemis ET aux boss : seule la DIRECTION change
  * (-1 = vers le haut, +1 vers le bas), ainsi que la taille, la vitesse et le sprite
  * Ces valeurs seront choisies par "ProjectileManager" à la création : ainsi une seule classe suffit, au lieu de 2 presque identique
 */

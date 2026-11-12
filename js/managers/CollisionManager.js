@@ -1,5 +1,6 @@
 /**
  * Détection de collisions
+ * 
  * Cette classe répond à la question : Est-ce que ces rectangles se touchent ?
  * Elle ne modifie rien, ne joue aucun son, et ne change aucun score (Game)
  * Cette séparation de classe "détecter/décider" rend la classe très simple à tester seule

@@ -18,7 +18,7 @@ export class ProjectileManager {
 
     constructor(assetLoader, canvasHeight) {
         this.#assetLoader = assetLoader;
-        this.canvasHeight = canvasHeight;
+        this.#canvasHeight = canvasHeight;
     }
 
     /**
@@ -108,6 +108,11 @@ export class ProjectileManager {
         this.#enemyBullets = [];
     }
 
+    /**
+     * Dessine les projectiles du joueur et les projectiles ennemis
+     * 
+     * @param {CanvasRenderingContext2D} ctx 
+     */
     draw(ctx) {
         for(const bullet of [...this.playerBullets, ...this.#enemyBullets]) {
             bullet.draw(ctx);
