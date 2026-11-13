@@ -41,8 +41,6 @@ export const SOUND_PATHS = {
     hit: './assets/sounds/hit.wav',
     gameOver: './assets/sounds/game-over.wav',
     victory: './assets/sounds/victory.wav',
-    
-    // Pour les exercices :
     menuSelect: './assets/sounds/menu-select.wav',
     bossArrive: './assets/sounds/boss-arrive.wav',
     bossDeath: './assets/sounds/boss-death.wav',

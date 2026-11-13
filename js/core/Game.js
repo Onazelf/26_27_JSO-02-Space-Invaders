@@ -92,21 +92,21 @@ export class Game {
     /**
      * Permet de démarrer la boucle de jeu
     */
-   start() {
+    start() {
        // performance.now() renvoie un temps précis en milliseconde depuis le début du contexte
        // On le mémorise pour calculer la durée écoulée entre 2 images
        this.#lastFrameTime = performance.now();
        
-       const loop = (now) => {
-           // dt = temps écoulé depuis la dernière image (s)
-           // Le plafond (Math.min) évite un énorme saut quand l'onglet est resté longtemps en arrière-plan
-           const dt = Math.min( (now - this.#lastFrameTime) / 1000, MAX_DELTA_TIME);
-           
-           this.#lastFrameTime = now;
-           this.update(dt); // On calcule le nouvel état du jeu
-           
-           this.render(); // On dessine cet état
-           requestAnimationFrame(loop);
+        const loop = (now) => {
+            // dt = temps écoulé depuis la dernière image (s)
+            // Le plafond (Math.min) évite un énorme saut quand l'onglet est resté longtemps en arrière-plan
+            const dt = Math.min( (now - this.#lastFrameTime) / 1000, MAX_DELTA_TIME);
+            
+            this.#lastFrameTime = now;
+            this.update(dt); // On calcule le nouvel état du jeu
+            
+            this.render(); // On dessine cet état
+            requestAnimationFrame(loop);
         }
         requestAnimationFrame(loop);
     }
@@ -270,7 +270,6 @@ export class Game {
 
             // On définit une constante boss pour ne pas réécrire trop de fois this.#boss.boss
             const boss = this.#boss.boss;
-            // Même chose pour isDead
             
             if(boss && this.#collisions.isColliding(bullet, boss)) {
                 const isDead = boss.takeHit(bullet.damage);

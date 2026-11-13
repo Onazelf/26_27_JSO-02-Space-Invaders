@@ -146,19 +146,24 @@ export class HUD {
 
         // Puis on dessine la barre de vie
         // On crée des constantes si jamais on veut changer la taille de la barre de vie
-        const healthBarWidth = 300;
+        const healthBarWidth = 335;
         const healthBarHeight = 30;
         // Cela permet de centrer la barre sur l'axe X
         const barX = width / 2 - healthBarWidth / 2
 
         // La barre rouge se construit sur toute la longueur initiale
-        ctx.fillStyle = "rgb(212, 35, 35)";
+        ctx.fillStyle = "rgb(226, 17, 17)";
         ctx.fillRect(barX, 55, healthBarWidth, healthBarHeight);
-
+        
         // La barre verte se construit en fonction du ratio de PV restants du boss (proportionnelle a la taille de la barre rouge) car c'est celle qui se réduit
         // On utilise un Math.max pour éviter toute valeur négative
         const ratio = Math.max(0, hp / maxHp);
-        ctx.fillStyle = "rgb(70, 224, 70)";
-        ctx.fillRect(barX, 55, healthBarWidth - ratio, healthBarHeight);
+        ctx.fillStyle = "rgb(44, 214, 44)";
+        ctx.fillRect(barX, 55, healthBarWidth * ratio, healthBarHeight);
+        
+        // On dessine le contour à la fin, sinon il chevauche qu'une barre sur 2
+        ctx.strokeStyle = "#615b69";
+        ctx.lineWidth = 5;
+        ctx.strokeRect(barX, 55, healthBarWidth, healthBarHeight);
     }
 }

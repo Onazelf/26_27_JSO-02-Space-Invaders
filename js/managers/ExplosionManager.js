@@ -13,8 +13,7 @@
  *     ├─────────┼─────────┤
  *     │ frame 2 │ frame 3 │  ← ligne 1
  *     └─────────┴─────────┘
-*
-*/
+ */
 import { EXPLOSION_DURATION, EXPLOSION_SIZE } from "../core/constants.js";
 
 const COLUMNS = 2;

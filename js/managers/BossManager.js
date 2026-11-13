@@ -1,6 +1,6 @@
 /**
  * Gestion du boss : récupère les propriétés du boss depuis Boss.js
-*/
+ */
 import { BOSS_SIZE, BOSS_Y, CANVAS_WIDTH } from "../core/constants.js";
 import { Boss } from "../entities/Boss.js";
 
