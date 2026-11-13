@@ -1,6 +1,7 @@
 /**
  * Chef d'orchestre du jeu, il décide de tout
-*/
+ */
+import { LEVELS } from "../data/levels.js";
 import { computeShipAttributes } from "../data/ships.js";
 import { Player } from "../entities/Player.js";
 import { BossManager } from "../managers/BossManager.js";
@@ -33,6 +34,7 @@ export class Game {
     #state = GameState.MAIN_MENU;
     #player = null;
     #level = null; // Le niveau en cours (objet de data/levels.js)
+    #levelIndex = 0;
     #ship = null; // Le vaisseau choisi (objet de data/ships.js)
     #score = 0;
     #enemyShootTimer = 0; // Compte à rebours avant le prochain tir ennemi
@@ -67,6 +69,7 @@ export class Game {
      */
     startLevel(level, ship) {
         this.#level = level;
+        this.#levelIndex = 0;
         this.#ship = ship;
         this.#score = 0;
         this.#bossSpawned = false;
@@ -90,13 +93,31 @@ export class Game {
     }
 
     /**
+     * Après l'état de transition on lance le niveau suivant sans réinitialiser les variables score, ship et la classe du joueur
+     * @param {object} level voir data/levels.js 
+     */
+    startNextLevel(level) {
+        this.#level = level;
+        this.#bossSpawned = false;
+        this.#enemyShootTimer = level.shootInterval;
+
+        // On réinitialise avant d'instancier
+        this.#projectiles.clear();
+        this.#explosions.clear();
+        this.#enemies.spawn(level);
+        this.#boss.clear();
+
+        this.#state = GameState.PLAYING;
+    }
+
+    /**
      * Permet de démarrer la boucle de jeu
     */
     start() {
-       // performance.now() renvoie un temps précis en milliseconde depuis le début du contexte
-       // On le mémorise pour calculer la durée écoulée entre 2 images
-       this.#lastFrameTime = performance.now();
-       
+        // performance.now() renvoie un temps précis en milliseconde depuis le début du contexte
+        // On le mémorise pour calculer la durée écoulée entre 2 images
+        this.#lastFrameTime = performance.now();
+
         const loop = (now) => {
             // dt = temps écoulé depuis la dernière image (s)
             // Le plafond (Math.min) évite un énorme saut quand l'onglet est resté longtemps en arrière-plan
@@ -122,7 +143,7 @@ export class Game {
     
     /**
      * Touches qui marchent quel que soit l'état: son, pause, rejouer...
-    */
+     */
     #handleGlobalInput() {
         if(this.#input.wasPressed("Enter") && this.#state === GameState.MAIN_MENU) {
             this.#state = GameState.PLAYING;
@@ -352,12 +373,27 @@ export class Game {
         if(!this.#player.isAlive || hasBeenInvaded) {
             this.#state = GameState.GAME_OVER;
             this.#sound.play("gameOver");
+            // On réinitialise l'index quand la partie est finie
+            this.#levelIndex = 0;
             return;
         }
 
         if(this.#enemies.isCleared && this.#boss.isCleared && this.#bossSpawned) {
-            this.#state = GameState.VICTORY;
-            this.#sound.play("victory");
+            if(this.#levelIndex + 1 < LEVELS.length) {
+                this.#state = GameState.TRANSITION;
+                // setTimeout permet de déclencher une pause et geler la page web (ici pendant 2s ou 2000ms l'état de transition est gelé et ensuite, le niveau suivant démarre)
+                setTimeout( () => {
+                    // On incrémente le niveau et l'index
+                    this.#levelIndex++;
+                    this.startNextLevel(LEVELS[this.#levelIndex])
+                }, 2000);
+
+            } else {
+                this.#state = GameState.VICTORY;
+                this.#sound.play("victory");
+                // On réinitialise l'index quand la partie est finie
+                this.#levelIndex = 0;
+            }
         }
     }
 
@@ -403,6 +439,6 @@ export class Game {
         // Si un boss existe et que l'on joue, on affiche sa barre de vie et son nom
         if(boss && this.#state === GameState.PLAYING) this.#hud.drawHealthBar(ctx, boss.hp, boss.maxHp, this.#level.bossName);
         
-        this.#hud.drawOverlay(ctx, this.#state, this.#score);
+        this.#hud.drawOverlay(ctx, this.#state, this.#level.name, this.#score);
     }
 }

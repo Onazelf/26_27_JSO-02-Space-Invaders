@@ -4,6 +4,7 @@
  * Le HUD (Head-Up Display) ne décide de rien : il reçoit des valeurs a afficher et les dessine
 */
 import { GameState } from "../core/GameState.js";
+import { LEVELS } from "../data/levels.js";
 
 const OVERLAYS = {
     [GameState.PAUSED] : {
@@ -28,6 +29,12 @@ const OVERLAYS = {
         title: "MENU PRINCIPAL",
         color: "#ffffff",
         lines: ["Entrée pour lancer une partie"]
+    },
+
+    [GameState.TRANSITION] : {
+        title: "BRAVO !",
+        color: "#60e6c9",
+        lines: [`Prochain niveau : `]
     }
 }
 
@@ -38,10 +45,10 @@ export class HUD {
     drawStats(ctx, { score, lives, levelName, shipSprite }) {
         // Fond translucide
         ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
-        ctx.fillRect(12, 12, 240, 88);
+        ctx.fillRect(12, 12, 260, 88);
         ctx.strokeStyle = "rgba(0, 204, 255, 0.5)";
         ctx.lineWidth = 1;
-        ctx.strokeRect(12, 12, 240, 88); // Contour (fillRect = plein, strokeRect = cadre)
+        ctx.strokeRect(12, 12, 260, 88); // Contour (fillRect = plein, strokeRect = cadre)
         
         this.#drawText(ctx, `Score : ${score}`, 24, 40, {size: 20});
         this.#drawText(ctx, levelName, 24, 90, { size : 14, color : "#88ddff" });
@@ -77,10 +84,10 @@ export class HUD {
     }
 
     /**
-     * Ecrans superposés pour les états pause, game over et victory
+     * Ecrans superposés pour les états pause, game over, victory et transition
      * Ne dessine rien pour les autres états
      */
-    drawOverlay(ctx, state, score) {
+    drawOverlay(ctx, state, levelName, score) {
         const overlay = OVERLAYS[state]; // On va chercher les textes de l'état courant
 
         if(!overlay) {
@@ -116,6 +123,8 @@ export class HUD {
 
         // Chaque ligne est décalée de 30px vers le bas grâce à son numéro (index)
         overlay.lines.forEach( (line, index) => {
+            // Quand on parcourt les différents états d'overlay, si c'est transition, on ajoute le nom du niveau comme variable, sinon uniquement le texte indiqué se dessine
+            if(overlay === GameState.TRANSITION) line = overlay.lines + levelName;
             this.#drawText(ctx, line, width / 2, height / 2 + 56 + index * 30, {
                 size: 18,
                 color: "#cccccc",

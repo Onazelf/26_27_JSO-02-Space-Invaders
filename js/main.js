@@ -35,7 +35,7 @@ async function main() {
 
         const game = new Game(canvas, assetLoader, soundManager);
 
-        // Chargement du level
+        // Chargement du premier level
         game.startLevel(LEVELS[0], DEFAULT_SHIP);
         // Démarrage de la boucle de jeu
         game.start();

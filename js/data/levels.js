@@ -21,7 +21,7 @@
 export const LEVELS = [
     {
         id: 1,
-        name: "Niveau 1 : Premier contact",
+        name: "Niv. 1 : Premier contact",
         rows: ["alien1", "alien2", "alien3"],
         boss: "boss1",
         bossName: "Trivex - Incarnation du masque fantôme",
@@ -33,5 +33,37 @@ export const LEVELS = [
         stepDown: 20,
         shootInterval: 1.1,
         bossShootInterval : 0.7
+    },
+
+    {
+        id: 2,
+        name: "Niv. 2 : Invasion imminente",
+        rows: ["alien3", "alien4", "alien5"],
+        boss: "boss2",
+        bossName: "Trivex - Incarnation du masque fantôme",
+        points: [35, 25, 15],
+        bossPoints: 100,
+        bossHP : 35,
+        columns: 10,
+        enemySpeed: 75,
+        stepDown: 20,
+        shootInterval: 1,
+        bossShootInterval : 0.6
+    },
+
+    {
+        id: 3,
+        name: "Niv. 3 : Nocturne défensive",
+        rows: ["alien4", "alien2", "alien5", "alien6"],
+        boss: "boss3",
+        bossName: "Trivex - Incarnation du masque fantôme",
+        points: [40, 25, 20, 15],
+        bossPoints: 120,
+        bossHP : 45,
+        columns: 10,
+        enemySpeed: 80,
+        stepDown: 20,
+        shootInterval: 1,
+        bossShootInterval : 0.6
     }
 ]

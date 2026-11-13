@@ -5,7 +5,7 @@
  * - toute la grille se déplace horizontalement d'un bloc
  * - quand le bloc touche un bord, on repart dans l'autre sens et on descend le bloc d'un cran
  * - plus il reste d'ennemis et plus la grille va vite
-*/
+ */
 import { CANVAS_WIDTH, ENEMY_GAP_X, ENEMY_GAP_Y, ENEMY_SIZE, ENEMY_START_Y } from "../core/constants.js";
 import { Enemy } from "../entities/Enemy.js";
 
